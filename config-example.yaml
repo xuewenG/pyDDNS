@@ -1,0 +1,7 @@
+DEBUG: true
+GD_KEY: <your godaddy key>
+GD_SECRET: <your godaddy secret>
+api: GODADDY
+domain:
+records:
+times: 0
