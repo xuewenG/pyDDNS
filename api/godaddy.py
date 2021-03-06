@@ -1,5 +1,5 @@
 import requests
-from utils.debug import *
+from utils.debug import d_print, e_print, i_print
 
 
 class Godaddy:
@@ -10,7 +10,8 @@ class Godaddy:
         self.baseUrl = 'https://api.godaddy.com'
         self.headers['Accept'] = 'application/json'
         self.headers['Content-Type'] = 'application/json'
-        self.headers['Authorization'] = 'sso-key ' + self.key + ':' + self.secret
+        self.headers['Authorization'] = 'sso-key ' + \
+            self.key + ':' + self.secret
 
     # list all domains.
     def list(self, statuses=None):
@@ -35,7 +36,7 @@ class Godaddy:
     def domain_details(self, domain):
         i_print('getting domain details')
         headers = self.headers
-        url = self.baseUrl + '/v1/domains/'+ domain.upper()
+        url = self.baseUrl + '/v1/domains/' + domain.upper()
         d_print('request url: ', url)
         i_print('sending request')
         r = requests.get(url=url, headers=headers)
@@ -76,7 +77,7 @@ class Godaddy:
         r = requests.patch(url=url, headers=headers, json=data)
         d_print('encoded url: ', r.url)
         if r.status_code == requests.codes.ok:
-            d_print('succeeded')
+            i_print('succeeded')
         else:
             e_print('add records by domain failed')
             r.raise_for_status()
@@ -85,7 +86,8 @@ class Godaddy:
     def update_record(self, domain, type, name, records):
         i_print('updating record')
         headers = self.headers
-        url = self.baseUrl + '/v1/domains/' + domain.upper() + '/records/' + type.upper() + '/' + name.upper()
+        url = self.baseUrl + '/v1/domains/' + domain.upper() + '/records/' + \
+            type.upper() + '/' + name.upper()
         d_print('request url: ', url)
         data = records
         d_print('data: ', data)
@@ -97,4 +99,3 @@ class Godaddy:
         else:
             e_print('add records by type name failed')
             r.raise_for_status()
-
