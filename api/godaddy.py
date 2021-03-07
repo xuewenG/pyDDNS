@@ -1,3 +1,4 @@
+import os
 import requests
 from utils.debug import d_print, e_print, i_print
 
@@ -99,3 +100,11 @@ class Godaddy:
         else:
             e_print('add records by type name failed')
             r.raise_for_status()
+    
+
+    @staticmethod
+    def load():
+        env = os.environ
+        GD_KEY = env.get('GD_KEY')
+        GD_SECRET = env.get('GD_SECRET')
+        return Godaddy(key=GD_KEY, secret=GD_SECRET)

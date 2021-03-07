@@ -18,10 +18,6 @@ def e_print(*args):
     print()
 
 
-from .config import Config
-config = Config.load()
-
-
 def d_print(*args):
     if DEBUG:
         print('Debug: ', end='')

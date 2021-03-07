@@ -1,0 +1,19 @@
+version: '3.8'
+networks:
+  my-bridge:
+    external:
+      name: my-bridge
+services:
+  pyddns:
+    build: .
+    image: ixuewen/pyddns
+    container_name: pyddns-docker
+    restart: always
+    networks:
+      - my-bridge
+    volumes:
+      - /root/.ssh:/root/.ssh:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - GD_KEY=${GD_KEY}
+      - GD_SECRET=${GD_SECRET}

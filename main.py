@@ -1,20 +1,18 @@
-import os
+import datetime
 import sys
+import time
+import traceback
 from api.godaddy import Godaddy
 from utils.debug import e_print, i_print
 from utils.nic_info import get_nic_ipv4_addr, get_nic_ipv6_addr, get_nic_list
 from utils.config import Config
 
 
-config = Config.load()
-
-env = os.environ
-GD_KEY = env.get('GD_KEY')
-GD_SECRET = env.get('GD_SECRET')
-gd = Godaddy(key=GD_KEY, secret=GD_SECRET)
-
 
 def try_update():
+    config = Config.load()
+    gd = Godaddy.load()
+
     domain = config['domain']
     local_records = config['records']
     local_record_names = list(map(lambda rec: rec['name'], local_records))
@@ -57,6 +55,7 @@ def try_update():
                                      record_name, new_records)
                 except Exception as err:
                     e_print('update record failed, exception: ', err)
+                    traceback.print_exc()
                     continue
                 i_print('addr renewed')
                 Config.store(config)
@@ -81,6 +80,7 @@ def select_nic():
 
 
 def select_domain():
+    gd = Godaddy.load()
     domain_list = gd.list(statuses=['ACTIVE', 'PENDING_DNS_ACTIVE'])
     if not domain_list:
         e_print('get domain list failed')
@@ -99,6 +99,7 @@ def select_domain():
 
 
 def select_record(domain):
+    gd = Godaddy.load()
     records = gd.records(domain)
     if not records:
         e_print('get record list failed')
@@ -133,10 +134,12 @@ def select_record(domain):
                 }
         except Exception as err:
             e_print(err)
+            traceback.print_exc()
         e_print("Invalid input! Input again.")
 
 
 def init_config():
+    config = Config.load()
     domain = select_domain()
     config["domain"] = domain
     config['records'] = []
@@ -156,12 +159,20 @@ def init_config():
 
 
 def main():
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     args = sys.argv
     if len(args) > 1 and args[1] == 'init':
         init_config()
-        return
+        exit()
     try_update()
+    print('==============================')
 
 
 if __name__ == '__main__':
-    main()
+    while True:
+        try:
+            main()
+        except Exception as err:
+            e_print(err)
+            traceback.print_exc()
+        time.sleep(10 * 60)
